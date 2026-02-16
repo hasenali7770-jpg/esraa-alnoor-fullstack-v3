@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root{
+  --bg: #071020;
+  --card: rgba(255,255,255,0.03);
+  --border: rgba(255,255,255,0.08);
+  --text: #EAF2FF;
+  --muted: #9FB0CF;
+  --accent: #2A7D8F;
+}
+[data-theme="light"]{
+  --bg: #F6F8FC;
+  --card: rgba(10,20,40,0.04);
+  --border: rgba(10,20,40,0.12);
+  --text: #0B1220;
+  --muted: #44526A;
+  --accent: #2A7D8F;
+}
+
+html,body{height:100%;}
+body{
+  background: radial-gradient(1200px 600px at 20% 10%, rgba(42,125,143,0.20), transparent 60%),
+              radial-gradient(1200px 600px at 70% 40%, rgba(100,140,255,0.14), transparent 60%),
+              var(--bg);
+  color: var(--text);
+}
+a{color:inherit}
