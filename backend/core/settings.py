@@ -12,10 +12,11 @@ DEBUG = os.getenv("DJANGO_DEBUG", "0") == "1"
 
 # Hosts
 allowed_hosts = os.getenv("DJANGO_ALLOWED_HOSTS", "*")
-allowed_hosts = os.getenv("DJANGO_ALLOWED_HOSTS", "*")
-ALLOWED_HOSTS = [h.strip() for h in allowed_hosts.split(",") if h.strip()] if allowed_hosts != "*" else ["*"]
-if allowed_hosts != "*" else ["*"]
 
+if allowed_hosts == "*":
+    ALLOWED_HOSTS = ["*"]
+else:
+    ALLOWED_HOSTS = [h.strip() for h in allowed_hosts.split(",") if h.strip()]
 # DB
 DATABASES = {
     "default": dj_database_url.config(default=os.getenv("DATABASE_URL"))
