@@ -12,25 +12,38 @@ DEBUG = os.getenv("DJANGO_DEBUG", "0") == "1"
 
 # Hosts
 allowed_hosts = os.getenv("DJANGO_ALLOWED_HOSTS", "*")
-
 if allowed_hosts == "*":
     ALLOWED_HOSTS = ["*"]
 else:
     ALLOWED_HOSTS = [h.strip() for h in allowed_hosts.split(",") if h.strip()]
-# DB
+
+# ✅ إعدادات قاعدة البيانات (معدلة لـ Supabase + Render)
+DATABASE_URL = os.getenv("DATABASE_URL")
+
 DATABASES = {
-    "default": dj_database_url.config(default=os.getenv("DATABASE_URL"))
+    "default": dj_database_url.config(
+        default=DATABASE_URL,
+        conn_max_age=600,
+        conn_health_checks=True,
+        ssl_require=True,  # ضروري جداً لـ Supabase
+    )
 }
 
 INSTALLED_APPS = [
-    "django.contrib.admin","django.contrib.auth","django.contrib.contenttypes","django.contrib.sessions",
-    "django.contrib.messages","django.contrib.staticfiles",
-    "rest_framework","corsheaders","api",
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "rest_framework",
+    "corsheaders",
+    "api",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",   # ✅ مهم لستايل admin
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # ✅ لإدارة الملفات الثابتة
     "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -43,7 +56,6 @@ MIDDLEWARE = [
 ROOT_URLCONF = "core.urls"
 WSGI_APPLICATION = "core.wsgi.application"
 
-# ✅ ضروري للـ Django Admin (يحل admin.E403)
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -60,9 +72,10 @@ TEMPLATES = [
     },
 ]
 
-# Static (admin css/js)
+# ✅ إعدادات الملفات الثابتة (Static Files)
 STATIC_URL = "static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+# التحسين لنسخة WhiteNoise الحديثة
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
@@ -79,7 +92,7 @@ CORS_ALLOW_CREDENTIALS = True
 csrf_origins = os.getenv("CSRF_TRUSTED_ORIGINS", "")
 CSRF_TRUSTED_ORIGINS = [o.strip() for o in csrf_origins.split(",") if o.strip()]
 
-# ✅ مفيد خلف Render/Proxy (مو ضروري بس يساعد)
+# ✅ التعامل مع البروكسي في Render
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 REST_FRAMEWORK = {
