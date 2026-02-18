@@ -1,7 +1,20 @@
-import { createClient } from "@supabase/supabase-js";
-
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-// Supabase is disabled; prevent app crash when env vars are missing
-export const supabase = (url && key) ? createClient(url, key) : (null as any);
+// Supabase disabled (project removed it).
+// Export a safe stub so the app never crashes.
+export const supabase: any = {
+  auth: {
+    getSession: async () => ({ data: { session: null }, error: null }),
+    getUser: async () => ({ data: { user: null }, error: null }),
+    onAuthStateChange: () => ({
+      data: { subscription: { unsubscribe: () => {} } },
+    }),
+    signInWithPassword: async () => ({ data: null, error: new Error("Supabase disabled") }),
+    signUp: async () => ({ data: null, error: new Error("Supabase disabled") }),
+    signOut: async () => ({ error: null }),
+  },
+  storage: {
+    from: () => ({
+      upload: async () => ({ data: null, error: new Error("Supabase disabled") }),
+      getPublicUrl: () => ({ data: { publicUrl: "" } }),
+    }),
+  },
+};
