@@ -4,10 +4,9 @@ interface ContainerProps {
 }
 
 export function Container({ children, className = "" }: ContainerProps) {
-  // دمج الكلاسات يدوياً بدون مكتبات خارجية
   const baseClasses = "mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8";
   const combinedClasses = className 
-    ? `${baseClasses} ${className}`.trim()
+    ? `${baseClasses} ${className}`.replace(/\s+/g, ' ').trim()
     : baseClasses;
   
   return (
