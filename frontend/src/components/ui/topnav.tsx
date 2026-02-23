@@ -1,49 +1,61 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { Container } from "./layout";
-import { Btn } from "./btn";
-import { usePrefs } from "@/lib/context/prefs";
-import { supabase } from "@/lib/supabase";
 
-export function TopNav(){
-  const { lang, currency, setCurrency, toggleTheme, theme } = usePrefs();
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
+import Link from "next/link";
+
+export function TopNav() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({data}) => setUserEmail(data.user?.email ?? null));
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, sess) => setUserEmail(sess?.user?.email ?? null));
-    return () => sub.subscription.unsubscribe();
+    // ✅ الحل: استخدام async/await بدلاً من then
+    const fetchUser = async () => {
+      const { data } = await supabase.auth.getUser();
+      setUserEmail(data.user?.email ?? null);
+    };
+
+    fetchUser();
+
+    // الاستماع لتغييرات حالة تسجيل الدخول
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, sess) => {
+      setUserEmail(sess?.user?.email ?? null);
+    });
+
+    return () => sub?.subscription.unsubscribe();
   }, []);
 
-  const otherLang = lang === "ar" ? "en" : "ar";
-  const otherLangLabel = lang === "ar" ? "EN" : "AR";
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+  };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[color:var(--border)] bg-black/30 backdrop-blur">
-      <Container>
-        <div className="flex flex-wrap items-center justify-between gap-2 py-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <Btn variant="ghost" href={`/${lang}`}>الرئيسية</Btn>
-            <Btn variant="ghost" href={`/${lang}/courses`}>الدورات</Btn>
-            <Btn variant="ghost" href={`/${lang}/pricing`}>الأسعار</Btn>
-            <Btn variant="ghost" href={`/${lang}/about`}>من نحن</Btn>
-            <Btn variant="ghost" href={`/${lang}/contact`}>تواصل معنا</Btn>
-            <Btn variant="ghost" href={`/${lang}/activate`}>تفعيل</Btn>
-            <Btn variant="ghost" href={`/${lang}/admin`}>لوحة التحكم</Btn>
-          </div>
+    <nav className="border-b border-stroke bg-white/80 backdrop-blur dark:border-night-stroke dark:bg-night-bg/80">
+      <div className="container mx-auto flex items-center justify-between px-4 py-3">
+        <Link href="/" className="text-lg font-semibold text-ink dark:text-night-text">
+          Esraa Al-Noor
+        </Link>
 
-          <div className="flex items-center gap-2">
-            <Btn variant="ghost" onClick={toggleTheme}>{theme==="dark"?"فاتح":"داكن"}</Btn>
-            <Btn variant="ghost" onClick={() => setCurrency(currency==="USD"?"IQD":"USD")}>{currency}</Btn>
-            <Btn variant="ghost" href={`/${otherLang}`}>{otherLangLabel}</Btn>
-            {userEmail ? (
-              <Btn variant="ghost" onClick={() => supabase.auth.signOut()}>خروج</Btn>
-            ) : (
-              <Btn variant="ghost" href={`/${lang}/login`}>دخول</Btn>
-            )}
-          </div>
+        <div className="flex items-center gap-4">
+          {userEmail ? (
+            <>
+              <span className="text-sm text-muted dark:text-night-muted">{userEmail}</span>
+              <button
+                onClick={handleLogout}
+                className="rounded-xl bg-brand px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
+              >
+                تسجيل خروج
+              </button>
+            </>
+          ) : (
+            <Link
+              href="/login"
+              className="rounded-xl bg-brand px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
+            >
+              تسجيل دخول
+            </Link>
+          )}
         </div>
-      </Container>
-    </header>
+      </div>
+    </nav>
   );
 }
