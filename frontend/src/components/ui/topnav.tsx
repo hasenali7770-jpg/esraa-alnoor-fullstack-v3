@@ -8,7 +8,7 @@ export function TopNav() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
 
   useEffect(() => {
-    // ✅ الحل: استخدام async/await بدلاً من then
+    // جلب المستخدم الحالي
     const fetchUser = async () => {
       const { data } = await supabase.auth.getUser();
       setUserEmail(data.user?.email ?? null);
@@ -16,8 +16,8 @@ export function TopNav() {
 
     fetchUser();
 
-    // الاستماع لتغييرات حالة تسجيل الدخول
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, sess) => {
+    // الاستماع لتغييرات حالة تسجيل الدخول - مع تحديد any
+    const { data: sub } = supabase.auth.onAuthStateChange((_e: any, sess: any) => {
       setUserEmail(sess?.user?.email ?? null);
     });
 
