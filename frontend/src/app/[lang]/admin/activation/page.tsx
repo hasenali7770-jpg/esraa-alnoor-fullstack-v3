@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Container } from "@/components/ui/container";
+import { Container } from "@/components/Container";  // ✅ تم تعديل المسار
 import { supabase } from "@/lib/supabase";
 
 export default function AdminActivationPage() {
